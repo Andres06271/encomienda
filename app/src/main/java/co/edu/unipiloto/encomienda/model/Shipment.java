@@ -7,26 +7,39 @@ public class Shipment {
     private String fecha;
     private String hora;
     private String tipo;
+    private String status; // 🔹 Nuevo campo
 
     // Constructor vacío (requerido por algunas librerías o adaptadores)
     public Shipment() {
     }
 
-    // Constructor sin ID (para cuando aún no se inserta en BD)
+    // Constructor sin ID ni status (para cuando aún no se inserta en BD, usa status por defecto)
     public Shipment(String direccion, String fecha, String hora, String tipo) {
         this.direccion = direccion;
         this.fecha = fecha;
         this.hora = hora;
         this.tipo = tipo;
+        this.status = "Pendiente"; // valor por defecto
     }
 
-    // Constructor con ID (cuando ya existe en BD)
+    // Constructor con ID y sin status (compatibilidad con código viejo)
     public Shipment(int id, String direccion, String fecha, String hora, String tipo) {
         this.id = id;
         this.direccion = direccion;
         this.fecha = fecha;
         this.hora = hora;
         this.tipo = tipo;
+        this.status = "Pendiente"; // valor por defecto
+    }
+
+    // 🔹 Constructor con ID y Status (cuando ya existe en BD)
+    public Shipment(int id, String direccion, String fecha, String hora, String tipo, String status) {
+        this.id = id;
+        this.direccion = direccion;
+        this.fecha = fecha;
+        this.hora = hora;
+        this.tipo = tipo;
+        this.status = status;
     }
 
     // Getters y Setters
@@ -68,5 +81,13 @@ public class Shipment {
 
     public void setTipo(String tipo) {
         this.tipo = tipo;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

@@ -19,28 +19,38 @@
             android:layout_height="wrap_content"
             android:text="Dirección"
             android:textStyle="bold"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/txtFecha"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Fecha"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/txtHora"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Hora"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/txtTipo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tipo de Encomienda"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
+
+        <!-- Nuevo campo para mostrar el estado -->
+        <TextView
+            android:id="@+id/txtEstado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estado"
+            android:textStyle="italic"
+            android:textSize="14sp"
+            android:textColor="@android:color/holo_blue_dark" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

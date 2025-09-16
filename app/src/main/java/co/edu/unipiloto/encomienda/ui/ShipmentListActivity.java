@@ -1,6 +1,11 @@
 package co.edu.unipiloto.encomienda.ui;
 
+import android.database.Cursor;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -42,15 +47,41 @@ public class ShipmentListActivity extends AppCompatActivity {
         dbHelper = new DBHelper(this);
         shipmentList = new ArrayList<>();
 
+        // Configurar el spinner de filtro
+        Spinner spinnerFilter = findViewById(R.id.spinnerFilterType);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                new String[]{"Todos", "Pendiente", "En camino", "Entregado"}
+        );
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerFilter.setAdapter(spinnerAdapter);
+
+        spinnerFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selected = parent.getItemAtPosition(position).toString();
+                if (selected.equals("Todos")) {
+                    loadShipments(); // 🔹 carga todo
+                } else {
+                    loadShipmentsByStatus(selected); // 🔹 carga filtrado
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        // Cargar por defecto todos los envíos
         loadShipments();
     }
 
     private void loadShipments() {
         shipmentList.clear();
 
-        // Consultar envíos del usuario
-        try (android.database.Cursor cursor = dbHelper.getReadableDatabase().rawQuery(
-                "SELECT id, address, date, time, type FROM shipments WHERE userEmail = ?",
+        // Consultar envíos del usuario (ahora también con status)
+        try (Cursor cursor = dbHelper.getReadableDatabase().rawQuery(
+                "SELECT id, address, date, time, type, status FROM shipments WHERE userEmail = ?",
                 new String[]{userEmail})) {
 
             if (cursor.moveToFirst()) {
@@ -60,10 +91,33 @@ public class ShipmentListActivity extends AppCompatActivity {
                     String date = cursor.getString(2);
                     String time = cursor.getString(3);
                     String type = cursor.getString(4);
+                    String status = cursor.getString(5);
 
-                    // Usamos el constructor con ID
-                    Shipment shipment = new Shipment(id, address, date, time, type);
-                    shipmentList.add(shipment);
+                    shipmentList.add(new Shipment(id, address, date, time, type, status));
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Error al cargar envíos: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+        adapter = new ShipmentAdapter(shipmentList);
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void loadShipmentsByStatus(String status) {
+        shipmentList.clear();
+
+        try (Cursor cursor = dbHelper.getShipmentsByStatus(userEmail, status)) {
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                    String address = cursor.getString(cursor.getColumnIndexOrThrow("address"));
+                    String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                    String time = cursor.getString(cursor.getColumnIndexOrThrow("time"));
+                    String type = cursor.getString(cursor.getColumnIndexOrThrow("type"));
+                    String shipmentStatus = cursor.getString(cursor.getColumnIndexOrThrow("status"));
+
+                    shipmentList.add(new Shipment(id, address, date, time, type, shipmentStatus));
                 } while (cursor.moveToNext());
             }
         } catch (Exception e) {

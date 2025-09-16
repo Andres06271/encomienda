@@ -36,6 +36,7 @@ public class ShipmentAdapter extends RecyclerView.Adapter<ShipmentAdapter.Shipme
         holder.txtFecha.setText("Fecha: " + shipment.getFecha());
         holder.txtHora.setText("Hora: " + shipment.getHora());
         holder.txtTipo.setText("Tipo: " + shipment.getTipo());
+        holder.txtStatus.setText("Estado: " + shipment.getStatus()); // 🔹 Nuevo
     }
 
     @Override
@@ -45,7 +46,7 @@ public class ShipmentAdapter extends RecyclerView.Adapter<ShipmentAdapter.Shipme
 
     public static class ShipmentViewHolder extends RecyclerView.ViewHolder {
 
-        TextView txtDireccion, txtFecha, txtHora, txtTipo;
+        TextView txtDireccion, txtFecha, txtHora, txtTipo, txtStatus;
 
         public ShipmentViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -53,6 +54,7 @@ public class ShipmentAdapter extends RecyclerView.Adapter<ShipmentAdapter.Shipme
             txtFecha = itemView.findViewById(R.id.txtFecha);
             txtHora = itemView.findViewById(R.id.txtHora);
             txtTipo = itemView.findViewById(R.id.txtTipo);
+            txtStatus = itemView.findViewById(R.id.txtEstado); // 🔹 Nuevo
         }
     }
 }
