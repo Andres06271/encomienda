@@ -35,14 +35,14 @@ public class LoginActivity extends AppCompatActivity {
         // Listener botón login
         btnLogin.setOnClickListener(v -> {
             String email = edtEmail.getText().toString().trim();
-            String password = edtPassword.getText().toString().trim();
+            String password = edtPassword.getText().toString().trim(); // Password en texto plano
 
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Complete los campos", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            boolean valid = dbHelper.validateUser(email, password);
+            boolean valid = dbHelper.validateUser(email, password); // Usar password en texto plano
             if (valid) {
                 Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
                 intent.putExtra("userEmail", email);

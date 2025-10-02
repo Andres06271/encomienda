@@ -31,7 +31,7 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(v -> {
             String name = edtName.getText().toString().trim();
             String email = edtEmail.getText().toString().trim();
-            String password = edtPassword.getText().toString().trim();
+            String password = edtPassword.getText().toString().trim(); // Password en texto plano
 
             if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Complete todos los campos", Toast.LENGTH_SHORT).show();
@@ -43,7 +43,10 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            boolean inserted = dbHelper.insertUser(name, email, password);
+            boolean inserted = dbHelper.insertUser(name, email, password); // Usar password en texto plano
+            // Si quieres permitir registrar admins, usa:
+            // boolean inserted = dbHelper.insertUser(name, email, password, true); // true para admin
+
             if (inserted) {
                 Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show();
                 finish();

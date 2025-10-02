@@ -1,11 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Light Theme Colors -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="gray_800">#424242</color>
-    <color name="gray_600">#757575</color>
-    <color name="gray_300">#BDBDBD</color>
-    <color name="teal_700">#018786</color>
-    <color name="teal_200">#03DAC5</color>
-    <color name="teal_900">#00574B</color>
+    
+    <!-- Nueva paleta de colores -->
+    <color name="primary">#4A6FA5</color>
+    <color name="primary_variant">#345785</color>
+    <color name="secondary">#9BA4B4</color>
+    <color name="secondary_variant">#728197</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="background">#F5F6F8</color>
+    <color name="error">#B4161B</color>
 
+    <!-- Dark Theme Colors -->
+    <color name="dark_background">#121212</color>
+    <color name="dark_surface">#1E1E1E</color>
+    <color name="dark_primary">#166088</color>
+    <color name="dark_primary_variant">#0A4F6E</color>
+    <color name="dark_secondary">#4F758B</color>
+    <color name="dark_secondary_variant">#2F576D</color>
+    <color name="dark_on_primary">#E1E1E1</color>
+    <color name="dark_on_secondary">#000000</color>
 </resources>

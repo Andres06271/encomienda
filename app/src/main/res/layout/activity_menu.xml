@@ -1,21 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp"
+    android:background="?attr/colorSurface">
 
-    <Button
-        android:id="@+id/btnRegistrarPedido"
-        android:text="Registrar Envío"
-        android:layout_width="200dp"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"/>
+        android:text="Menú Principal"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="?attr/colorPrimary"
+        android:layout_marginBottom="48dp"/>
 
-    <Button
-        android:id="@+id/btnVerPedidos"
-        android:text="Ver Mis Envíos"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"/>
+    <!-- Botones para usuario normal -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardRegistrarPedido"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:cardElevation="4dp"
+        app:cardCornerRadius="12dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRegistrarPedido"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:text="Registrar Envío"
+            android:textSize="16sp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardVerPedidos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="4dp"
+        app:cardCornerRadius="12dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVerPedidos"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:text="Ver Mis Envíos"
+            android:textSize="16sp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Botón para administrador -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardGestionarEnvios"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGestionarEnvios"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:text="Gestionar Envíos"
+            android:textSize="16sp"
+            android:visibility="gone" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Botón para mensajero -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardPedidosAsignados"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:cardElevation="4dp"
+        app:cardCornerRadius="12dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPedidosAsignados"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:text="Pedidos Asignados"
+            android:textSize="16sp"
+            android:visibility="gone"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+    </com.google.android.material.card.MaterialCardView>
+
 </LinearLayout>

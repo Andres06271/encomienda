@@ -16,9 +16,18 @@ import co.edu.unipiloto.encomienda.model.Shipment;
 public class ShipmentAdapter extends RecyclerView.Adapter<ShipmentAdapter.ShipmentViewHolder> {
 
     private List<Shipment> shipmentList;
+    private OnItemClickListener listener;
 
     public ShipmentAdapter(List<Shipment> shipmentList) {
         this.shipmentList = shipmentList;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(Shipment shipment);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -37,6 +46,12 @@ public class ShipmentAdapter extends RecyclerView.Adapter<ShipmentAdapter.Shipme
         holder.txtHora.setText("Hora: " + shipment.getHora());
         holder.txtTipo.setText("Tipo: " + shipment.getTipo());
         holder.txtStatus.setText("Estado: " + shipment.getStatus()); // 🔹 Nuevo
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(shipmentList.get(position));
+            }
+        });
     }
 
     @Override
