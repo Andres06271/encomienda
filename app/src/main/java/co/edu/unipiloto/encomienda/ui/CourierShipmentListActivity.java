@@ -63,6 +63,44 @@ public class CourierShipmentListActivity extends AppCompatActivity {
         }
 
         adapter = new ShipmentAdapter(shipmentList);
+        adapter.setOnItemClickListener(shipment -> showChangeStatusDialog(shipment));
         recyclerView.setAdapter(adapter);
+    }
+
+    private void showChangeStatusDialog(Shipment shipment) {
+        String[] estados = {"En camino", "Entregado"};
+        int selectedIdx = getEstadoIndex(shipment.getStatus());
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Cambiar estado")
+            .setSingleChoiceItems(estados, selectedIdx, null)
+            .setPositiveButton("Guardar", (dialog, which) -> {
+                androidx.appcompat.app.AlertDialog alert = (androidx.appcompat.app.AlertDialog) dialog;
+                int selectedPosition = alert.getListView().getCheckedItemPosition();
+                String nuevoEstado = estados[selectedPosition];
+                // Actualiza el estado usando los datos actuales del envío
+                DBHelper dbHelper = new DBHelper(this);
+                boolean ok = dbHelper.updateShipment(
+                    shipment.getId(),
+                    shipment.getDireccion(),
+                    shipment.getFecha(),
+                    shipment.getHora(),
+                    shipment.getTipo(),
+                    nuevoEstado
+                );
+                if (ok) {
+                    Toast.makeText(this, "Estado actualizado", Toast.LENGTH_SHORT).show();
+                    loadAssignedShipments();
+                } else {
+                    Toast.makeText(this, "Error al actualizar estado", Toast.LENGTH_SHORT).show();
+                }
+            })
+            .setNegativeButton("Cancelar", null)
+            .show();
+    }
+
+    private int getEstadoIndex(String estado) {
+        if ("En camino".equals(estado)) return 0;
+        if ("Entregado".equals(estado)) return 1;
+        return 0;
     }
 }

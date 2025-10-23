@@ -74,7 +74,7 @@ public class MenuActivity extends AppCompatActivity {
 
         // Ir a pedidos asignados (solo para courier)
         btnPedidosAsignados.setOnClickListener(v -> {
-            Intent intent = new Intent(MenuActivity.this, CourierShipmentListActivity.class);
+            Intent intent = new Intent(MenuActivity.this, CourierMapActivity.class);
             intent.putExtra("userEmail", userEmail);
             startActivity(intent);
         });

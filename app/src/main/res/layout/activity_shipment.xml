@@ -31,18 +31,47 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="24dp"/>
 
-            <!-- Dirección -->
-            <com.google.android.material.textfield.TextInputLayout
+            <!-- Contenedor de dirección con mapa preview -->
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="Dirección de recolección">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etAddress"
+                android:layout_marginTop="8dp">
+
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPostalAddress"/>
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:hint="Dirección de recolección">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPostalAddress"
+                        android:focusable="false"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <ImageView
+                    android:id="@+id/ivMapIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_dialog_map"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="12dp"/>
+            </FrameLayout>
+
+            <!-- Vista previa del mapa -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/mapPreviewCard"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="8dp"
+                android:visibility="gone">
+
+                <org.osmdroid.views.MapView
+                    android:id="@+id/mapPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </androidx.cardview.widget.CardView>
 
             <!-- Fecha -->
             <com.google.android.material.textfield.TextInputLayout
