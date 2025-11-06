@@ -12,8 +12,8 @@ import java.util.List;
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "encomienda.db";
-    // Incrementamos la versión para forzar la recreación
-    private static final int DATABASE_VERSION = 12;
+    // Incrementamos la versión para forzar la recreación / migración
+    private static final int DATABASE_VERSION = 13; // ...cambiado de 12 a 13...
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -27,19 +27,21 @@ public class DBHelper extends SQLiteOpenHelper {
                 "name TEXT NOT NULL," +
                 "email TEXT NOT NULL UNIQUE," +
                 "password TEXT NOT NULL," +
-                "role TEXT NOT NULL DEFAULT 'user')"; // cambio de isAdmin a role
+                "role TEXT NOT NULL DEFAULT 'user')";
         db.execSQL(CREATE_USERS_TABLE);
 
-        // Tabla envíos (incluye columna status con valor por defecto 'Pendiente')
+        // Tabla envíos (ahora incluye latitude y longitude como REAL)
         String CREATE_SHIPMENTS_TABLE = "CREATE TABLE shipments (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "userEmail TEXT," +
-                "courierEmail TEXT," + // Nueva columna
+                "courierEmail TEXT," +
                 "address TEXT NOT NULL," +
                 "date TEXT NOT NULL," +
                 "time TEXT NOT NULL," +
                 "type TEXT NOT NULL," +
-                "status TEXT DEFAULT 'Pendiente')";
+                "status TEXT DEFAULT 'Pendiente'," +
+                "latitude REAL DEFAULT 0.0," +
+                "longitude REAL DEFAULT 0.0)";
         db.execSQL(CREATE_SHIPMENTS_TABLE);
 
         // Insertar usuario administrador
@@ -74,6 +76,16 @@ public class DBHelper extends SQLiteOpenHelper {
                 db.execSQL("ALTER TABLE shipments ADD COLUMN courierEmail TEXT");
             } catch (Exception e) {
                 // Si falla, manejar el error
+            }
+        }
+
+        if (oldVersion < 13) {
+            try {
+                // Añadir columnas latitude y longitude
+                db.execSQL("ALTER TABLE shipments ADD COLUMN latitude REAL DEFAULT 0.0");
+                db.execSQL("ALTER TABLE shipments ADD COLUMN longitude REAL DEFAULT 0.0");
+            } catch (Exception e) {
+                // ignorar si ya existen
             }
         }
     }
@@ -137,12 +149,19 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // Métodos de envíos
+    // Mantener compatibilidad: sobrecarga sin lat/lon que delega a la nueva firma
     public boolean insertShipment(String userEmail, String address, String date, String time, String type) {
-        return insertShipment(userEmail, address, date, time, type, "Pendiente");
+        return insertShipment(userEmail, address, date, time, type, "Pendiente", 0.0, 0.0);
     }
 
     public boolean insertShipment(String userEmail, String address, String date, String time,
                                   String type, String status) {
+        return insertShipment(userEmail, address, date, time, type, status, 0.0, 0.0);
+    }
+
+    // Nueva firma que guarda latitude y longitude
+    public boolean insertShipment(String userEmail, String address, String date, String time,
+                                  String type, String status, double latitude, double longitude) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("userEmail", userEmail);
@@ -151,6 +170,8 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put("time", time);
         values.put("type", type);
         values.put("status", status);
+        values.put("latitude", latitude);
+        values.put("longitude", longitude);
         long result = db.insert("shipments", null, values);
         return result != -1;
     }

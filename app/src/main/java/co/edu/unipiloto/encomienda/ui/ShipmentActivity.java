@@ -32,6 +32,11 @@ public class ShipmentActivity extends AppCompatActivity {
     private CardView mapPreviewCard;
     private GeoPoint selectedLocation;
 
+    // Nuevos campos para lat/lon seleccionadas
+    private double selectedLat = 0.0;
+    private double selectedLon = 0.0;
+    private boolean locationSelected = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +82,14 @@ public class ShipmentActivity extends AppCompatActivity {
             return;
         }
 
-        boolean inserted = dbHelper.insertShipment(userEmail, address, date, time, type);
+        // Requerimos que el usuario haya seleccionado una ubicación desde el MapDialog
+        if (!locationSelected) {
+            Toast.makeText(this, "Seleccione una ubicación para el envío", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // Llamada corregida incluyendo el status "Pendiente"
+        boolean inserted = dbHelper.insertShipment(userEmail, address, date, time, type, "Pendiente", selectedLat, selectedLon);
 
         if (inserted) {
             Toast.makeText(this, "Envío guardado correctamente", Toast.LENGTH_LONG).show();
@@ -85,6 +97,11 @@ public class ShipmentActivity extends AppCompatActivity {
             etDate.setText("");
             etTime.setText("");
             etType.setText("");
+            // reset ubicación seleccionada
+            locationSelected = false;
+            selectedLat = 0.0;
+            selectedLon = 0.0;
+            mapPreviewCard.setVisibility(View.GONE);
         } else {
             Toast.makeText(this, "Error al guardar el envío", Toast.LENGTH_LONG).show();
         }
@@ -95,6 +112,10 @@ public class ShipmentActivity extends AppCompatActivity {
             new MapDialog(this, (address, latitude, longitude) -> {
                 etAddress.setText(address);
                 selectedLocation = new GeoPoint(latitude, longitude);
+                // Guardar lat/lon seleccionadas
+                selectedLat = latitude;
+                selectedLon = longitude;
+                locationSelected = true;
                 updateMapPreview();
             }).show();
         }
