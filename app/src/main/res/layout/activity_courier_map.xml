@@ -16,7 +16,18 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:layout_gravity="bottom|end"
+        android:contentDescription="@string/courier_list_label"
         android:src="@android:drawable/ic_dialog_dialer"
+        app:fabSize="normal"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabRoutePlanner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_gravity="bottom|start"
+        android:contentDescription="@string/route_plan_label"
+        android:src="@android:drawable/ic_menu_directions"
         app:fabSize="normal"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

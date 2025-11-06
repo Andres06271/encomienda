@@ -41,6 +41,8 @@
         <activity android:name=".ui.CourierShipmentListActivity" />
 
         <activity android:name=".ui.CourierMapActivity" />
+
+        <activity android:name=".ui.GpsActivity" />
     </application>
 
 </manifest>

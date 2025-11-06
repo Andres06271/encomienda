@@ -73,6 +73,14 @@
                     android:layout_height="match_parent"/>
             </androidx.cardview.widget.CardView>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnUseCurrentLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/use_current_location"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
             <!-- Fecha -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"

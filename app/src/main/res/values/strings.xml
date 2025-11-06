@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">encomienda</string>
+    <string name="location_not_found">No se pudo obtener la ubicación</string>
+    <string name="location_fetching">Obteniendo ubicación...</string>
+    <string name="location_error_generic">Error al obtener la ubicación</string>
+    <string name="location_ready">Ubicación actual lista</string>
+    <string name="location_address_loading">Dirección: buscando...</string>
+    <string name="location_address_unavailable">Sin dirección disponible</string>
+    <string name="location_address_pattern">Dirección: %1$s</string>
+    <string name="location_coords_pattern">Latitud: %1$.6f | Longitud: %2$.6f</string>
+    <string name="location_permission_denied">Permiso de ubicación denegado</string>
+    <string name="use_current_location">USAR UBICACION ACTUAL</string>
+    <string name="location_fallback_address">%1$.6f, %2$.6f</string>
+    <string name="courier_list_label">Ver pedidos asignados en lista</string>
+    <string name="route_plan_label">Planear recorrido</string>
+    <string name="route_plan_no_shipments">No hay encomiendas con ubicación asignada para planear la ruta.</string>
+    <string name="route_plan_no_maps">No se encontró la app de Google Maps en el dispositivo.</string>
+    <string name="route_plan_limit_warning">Solo se usarán las primeras %1$d direcciones para la planificación.</string>
 </resources>
