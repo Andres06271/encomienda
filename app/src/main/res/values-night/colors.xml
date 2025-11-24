@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Light Theme Colors -->
+    <!-- Dark Theme Colors -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    
-    <!-- Nueva paleta de colores -->
-    <color name="primary">#4A6FA5</color>
-    <color name="primary_variant">#345785</color>
-    <color name="secondary">#9BA4B4</color>
-    <color name="secondary_variant">#728197</color>
-    <color name="surface">#FFFFFF</color>
-    <color name="background">#F5F6F8</color>
+    <color name="primary">#166088</color>
+    <color name="primary_variant">#0A4F6E</color>
+    <color name="secondary">#4F758B</color>
+    <color name="secondary_variant">#2F576D</color>
+    <color name="surface">#1E1E1E</color>
+    <color name="background">#121212</color>
     <color name="error">#B4161B</color>
-
-    <!-- Dark Theme Colors -->
     <color name="dark_background">#121212</color>
     <color name="dark_surface">#1E1E1E</color>
     <color name="dark_primary">#166088</color>
@@ -22,11 +18,10 @@
     <color name="dark_secondary_variant">#2F576D</color>
     <color name="dark_on_primary">#E1E1E1</color>
     <color name="dark_on_secondary">#000000</color>
-
     <!-- Estados de notificaciones -->
-    <color name="notification_unread_background">#E8F1FB</color>
-    <color name="notification_read_background">#FFFFFF</color>
-    <color name="notification_icon_bg">#F0F4F8</color>
+    <color name="notification_unread_background">#23272A</color>
+    <color name="notification_read_background">#1E1E1E</color>
+    <color name="notification_icon_bg">#23272A</color>
     <color name="notification_icon_shipment">#FFA726</color>
     <color name="notification_icon_route">#42A5F5</color>
     <color name="notification_icon_delivered">#66BB6A</color>

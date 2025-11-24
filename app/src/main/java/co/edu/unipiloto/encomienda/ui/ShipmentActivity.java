@@ -152,9 +152,20 @@ public class ShipmentActivity extends AppCompatActivity {
             selectedLon = 0.0;
             selectedLocation = null;
             mapPreviewCard.setVisibility(View.GONE);
+            insertNotificationForUser(address);
         } else {
             Toast.makeText(this, "Error al guardar el envío", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void insertNotificationForUser(String address) {
+        long now = System.currentTimeMillis();
+        dbHelper.insertNotification(
+            userEmail,
+            getString(R.string.notification_title_new_shipment),
+            getString(R.string.notification_body_new_shipment, address),
+            now
+        );
     }
 
     private void openMapDialog() {

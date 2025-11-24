@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import co.edu.unipiloto.encomienda.R;
 import co.edu.unipiloto.encomienda.db.DBHelper;
+import co.edu.unipiloto.encomienda.utils.NotificationHelper;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -23,6 +24,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+            // Crear canal de notificaciones al iniciar la app
+            NotificationHelper.createNotificationChannel(this);
 
         // Vincular vistas con IDs del layout
         edtEmail = findViewById(R.id.etEmailLogin);

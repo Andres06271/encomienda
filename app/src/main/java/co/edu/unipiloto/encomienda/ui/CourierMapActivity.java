@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
+import android.widget.TextView;
+import android.view.View;
 
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
@@ -35,6 +37,8 @@ public class CourierMapActivity extends AppCompatActivity {
     private DBHelper dbHelper;
     private String courierEmail;
     private FloatingActionButton routePlannerFab;
+    private FloatingActionButton notificationsFab;
+    private TextView notificationBadge;
 
     private final List<ShipmentLocation> assignedShipments = new ArrayList<>();
 
@@ -94,6 +98,12 @@ public class CourierMapActivity extends AppCompatActivity {
         if (routePlannerFab != null) {
             routePlannerFab.setOnClickListener(v -> openRoutePlanner());
         }
+
+        notificationsFab = findViewById(R.id.fabNotifications);
+        notificationBadge = findViewById(R.id.tvNotificationBadgeCourier);
+        if (notificationsFab != null) {
+            notificationsFab.setOnClickListener(v -> openNotificationCenter());
+        }
     }
 
     private void loadShipmentsOnMap() {
@@ -124,6 +134,7 @@ public class CourierMapActivity extends AppCompatActivity {
 
     private void openRoutePlanner() {
         List<ShipmentLocation> validShipments = new ArrayList<>();
+        List<String> affectedUsers = new ArrayList<>();
         for (ShipmentLocation shipment : assignedShipments) {
             if (shipment.hasValidCoordinates()) {
                 validShipments.add(shipment);
@@ -133,6 +144,13 @@ public class CourierMapActivity extends AppCompatActivity {
         if (validShipments.isEmpty()) {
             showToast(R.string.route_plan_no_shipments);
             return;
+        }
+
+        for (ShipmentLocation shipment : validShipments) {
+            String userEmail = dbHelper.getUserEmailForShipment(shipment.id);
+            if (userEmail != null && !affectedUsers.contains(userEmail)) {
+                affectedUsers.add(userEmail);
+            }
         }
 
         int maxStops = MAX_OPTIMIZED_WAYPOINTS + 1;
@@ -152,6 +170,7 @@ public class CourierMapActivity extends AppCompatActivity {
             if (trimmed) {
                 showToast(getString(R.string.route_plan_limit_warning, maxStops));
             }
+            notifyUsersRouteStarted(affectedUsers, shipmentsForRoute);
             startActivity(mapIntent);
             return;
         } catch (ActivityNotFoundException primaryException) {
@@ -164,12 +183,41 @@ public class CourierMapActivity extends AppCompatActivity {
             if (trimmed) {
                 showToast(getString(R.string.route_plan_limit_warning, maxStops));
             }
+            notifyUsersRouteStarted(affectedUsers, shipmentsForRoute);
             startActivity(fallbackIntent);
         } catch (ActivityNotFoundException secondaryException) {
             Log.w("CourierMap", "Fallback map intent failed", secondaryException);
             showToast(R.string.route_plan_no_maps);
         }
     }
+
+    private void notifyUsersRouteStarted(List<String> userEmails, List<ShipmentLocation> shipmentsForRoute) {
+        if (userEmails.isEmpty()) {
+            return;
+        }
+
+        long now = System.currentTimeMillis();
+        String referenceAddress = shipmentsForRoute.isEmpty() ? "" : shipmentsForRoute.get(0).address;
+        for (String userEmail : userEmails) {
+            if (userEmail == null) {
+                continue;
+            }
+            dbHelper.insertNotification(
+                userEmail,
+                getString(R.string.notification_title_route_started),
+                getString(R.string.notification_body_route_started, referenceAddress),
+                now
+            );
+        }
+    }
+
+    private void openNotificationCenter() {
+        Intent intent = new Intent(this, NotificationCenterActivity.class);
+        intent.putExtra("userEmail", courierEmail);
+        startActivity(intent);
+    }
+
+    
 
     private Uri buildRouteUri(List<ShipmentLocation> shipments) {
         Uri.Builder builder = new Uri.Builder()
@@ -244,6 +292,7 @@ public class CourierMapActivity extends AppCompatActivity {
         try {
             if (dbHelper.updateShipment(shipmentId, address, "", "", type, newStatus)) {
                 Toast.makeText(this, "Estado actualizado a: " + newStatus, Toast.LENGTH_SHORT).show();
+                notifyStatusChange(shipmentId, address, newStatus);
                 loadShipmentsOnMap();
             } else {
                 throw new Exception("Error en la actualización");
@@ -263,15 +312,52 @@ public class CourierMapActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
+    private void notifyStatusChange(int shipmentId, String address, String status) {
+    String userEmail = dbHelper.getUserEmailForShipment(shipmentId);
+        if (userEmail == null) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        if ("Entregado".equalsIgnoreCase(status)) {
+            dbHelper.insertNotification(
+                userEmail,
+                getString(R.string.notification_title_delivered),
+                getString(R.string.notification_body_delivered, address),
+                now
+            );
+        } else if ("En camino".equalsIgnoreCase(status)) {
+            dbHelper.insertNotification(
+                userEmail,
+                getString(R.string.notification_title_route_started),
+                getString(R.string.notification_body_route_started, address),
+                now
+            );
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         mapView.onResume();
+        updateNotificationBadge();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mapView.onPause();
+    }
+
+    private void updateNotificationBadge() {
+        if (courierEmail == null || dbHelper == null || notificationBadge == null) {
+            return;
+        }
+        int unreadCount = dbHelper.countUnreadNotifications(courierEmail);
+        if (unreadCount > 0) {
+            notificationBadge.setVisibility(View.VISIBLE);
+            notificationBadge.setText(String.valueOf(unreadCount));
+        } else {
+            notificationBadge.setVisibility(View.GONE);
+        }
     }
 }

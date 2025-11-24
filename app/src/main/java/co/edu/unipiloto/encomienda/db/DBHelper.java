@@ -9,14 +9,19 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import co.edu.unipiloto.encomienda.utils.NotificationHelper;
+
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "encomienda.db";
     // Incrementamos la versión para forzar la recreación / migración
-    private static final int DATABASE_VERSION = 13; // ...cambiado de 12 a 13...
+    private static final int DATABASE_VERSION = 14; // actualizado para tabla de notificaciones
+
+    private final Context context;
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -59,6 +64,9 @@ public class DBHelper extends SQLiteOpenHelper {
         courierValues.put("password", "mensajero123");
         courierValues.put("role", "courier");
         db.insert("users", null, courierValues);
+
+    // Tabla de notificaciones locales
+    createNotificationsTable(db);
     }
 
     @Override
@@ -88,6 +96,21 @@ public class DBHelper extends SQLiteOpenHelper {
                 // ignorar si ya existen
             }
         }
+
+        if (oldVersion < 14) {
+            createNotificationsTable(db);
+        }
+    }
+
+    private void createNotificationsTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS notifications (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "userEmail TEXT NOT NULL," +
+                "title TEXT NOT NULL," +
+                "message TEXT NOT NULL," +
+                "createdAt INTEGER NOT NULL," +
+                "isRead INTEGER NOT NULL DEFAULT 0)");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(userEmail, isRead)");
     }
 
     // Insertar usuario (ahora con parámetro role)
@@ -148,6 +171,33 @@ public class DBHelper extends SQLiteOpenHelper {
         return "courier".equals(getUserRole(email));
     }
 
+    // Obtener todos los usuarios (id, name, email, role)
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT id, name, email, role FROM users", null);
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                String email = cursor.getString(cursor.getColumnIndexOrThrow("email"));
+                String role = cursor.getString(cursor.getColumnIndexOrThrow("role"));
+                users.add(new User(id, name, email, role));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return users;
+    }
+
+    // Actualizar el rol de un usuario por id
+    public boolean updateUserRole(int userId, String newRole) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("role", newRole);
+        int rows = db.update("users", values, "id = ?", new String[]{String.valueOf(userId)});
+        return rows > 0;
+    }
+
     // Métodos de envíos
     // Mantener compatibilidad: sobrecarga sin lat/lon que delega a la nueva firma
     public boolean insertShipment(String userEmail, String address, String date, String time, String type) {
@@ -192,6 +242,15 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM shipments WHERE id = ?",
                 new String[]{String.valueOf(id)});
+    }
+
+    public String getUserEmailForShipment(int shipmentId) {
+        try (Cursor cursor = getShipmentById(shipmentId)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                return cursor.getString(cursor.getColumnIndexOrThrow("userEmail"));
+            }
+        }
+        return null;
     }
 
     // Obtener TODOS los envíos (solo para admin)
@@ -255,6 +314,64 @@ public class DBHelper extends SQLiteOpenHelper {
             "SELECT * FROM shipments WHERE courierEmail = ? ORDER BY date, time",
             new String[]{courierEmail}
         );
+    }
+
+    // ===================== Notificaciones locales =====================
+
+    public long insertNotification(String userEmail, String title, String message, long createdAtMillis) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("userEmail", userEmail);
+        values.put("title", title);
+        values.put("message", message);
+        values.put("createdAt", createdAtMillis);
+        values.put("isRead", 0);
+            long notificationId = db.insert("notifications", null, values);
+        
+            // Mostrar notificación push de Android
+            if (notificationId != -1 && context != null) {
+                NotificationHelper.showNotification(context, userEmail, title, message, (int) notificationId);
+            }
+        
+            return notificationId;
+    }
+
+    public Cursor getNotificationsForUser(String userEmail) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+            "SELECT * FROM notifications WHERE userEmail = ? ORDER BY createdAt DESC",
+            new String[]{userEmail}
+        );
+    }
+
+    public int markNotificationAsRead(long notificationId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("isRead", 1);
+        return db.update("notifications", values, "id = ?", new String[]{String.valueOf(notificationId)});
+    }
+
+    public int markAllNotificationsAsRead(String userEmail) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("isRead", 1);
+        return db.update("notifications", values, "userEmail = ? AND isRead = 0", new String[]{userEmail});
+    }
+
+    public int countUnreadNotifications(String userEmail) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+            "SELECT COUNT(*) FROM notifications WHERE userEmail = ? AND isRead = 0",
+            new String[]{userEmail}
+        );
+        try {
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            }
+            return 0;
+        } finally {
+            cursor.close();
+        }
     }
 }
 

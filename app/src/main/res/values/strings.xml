@@ -16,4 +16,19 @@
     <string name="route_plan_no_shipments">No hay encomiendas con ubicación asignada para planear la ruta.</string>
     <string name="route_plan_no_maps">No se encontró la app de Google Maps en el dispositivo.</string>
     <string name="route_plan_limit_warning">Solo se usarán las primeras %1$d direcciones para la planificación.</string>
+    <string name="notification_title_label">Título</string>
+    <string name="notification_message_label">Mensaje</string>
+    <string name="notification_empty_state">No tienes notificaciones aún.</string>
+    <string name="notification_center_label">Notificaciones</string>
+    <string name="notification_title_new_shipment">Envío registrado</string>
+    <string name="notification_body_new_shipment">Tu encomienda se creó con destino a %1$s.</string>
+    <string name="notification_title_route_started">Repartidor en camino</string>
+    <string name="notification_body_route_started">El mensajero inició el recorrido para la dirección %1$s.</string>
+    <string name="notification_title_delivered">Envío entregado</string>
+    <string name="notification_body_delivered">Tu encomienda para %1$s fue entregada.</string>
+    <string name="notification_unread_count">No leídas: %1$d</string>
+    <string name="notification_mark_all_read">Marcar todas como leídas</string>
+    <string name="notification_mark_all_done">Todas las notificaciones marcadas como leídas.</string>
+    <string name="notification_none_to_mark_read">No hay notificaciones pendientes.</string>
+    <string name="notification_center_missing_user">No se pudo cargar el usuario. Intenta iniciar sesión nuevamente.</string>
 </resources>
