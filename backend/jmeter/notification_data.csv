@@ -1,0 +1,11 @@
+userEmail,title,body
+user1@mail.com,Envío creado,Tu envío ha sido creado exitosamente
+user2@mail.com,Envío en tránsito,Tu envío está en camino
+user3@mail.com,Envío entregado,Tu envío ha sido entregado
+user4@mail.com,Recordatorio,No olvides revisar el estado de tu envío
+user5@mail.com,Actualización,Hay una actualización en tu envío
+user6@mail.com,Confirmación,Tu envío fue confirmado por el mensajero
+user7@mail.com,Alerta,Tu envío requiere atención
+user8@mail.com,Notificación importante,Revisa los detalles de tu envío
+user9@mail.com,Envío completado,Gracias por usar nuestro servicio
+user10@mail.com,Nueva notificación,Tienes un mensaje del mensajero

@@ -15,7 +15,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "encomienda.db";
     // Incrementamos la versión para forzar la recreación / migración
-    private static final int DATABASE_VERSION = 14; // actualizado para tabla de notificaciones
+    private static final int DATABASE_VERSION = 15; // +1: columna remoteId en shipments
 
     private final Context context;
 
@@ -36,7 +36,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_USERS_TABLE);
 
         // Tabla envíos (ahora incluye latitude y longitude como REAL)
-        String CREATE_SHIPMENTS_TABLE = "CREATE TABLE shipments (" +
+    String CREATE_SHIPMENTS_TABLE = "CREATE TABLE shipments (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "userEmail TEXT," +
                 "courierEmail TEXT," +
@@ -46,7 +46,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 "type TEXT NOT NULL," +
                 "status TEXT DEFAULT 'Pendiente'," +
                 "latitude REAL DEFAULT 0.0," +
-                "longitude REAL DEFAULT 0.0)";
+        "longitude REAL DEFAULT 0.0," +
+        "remoteId INTEGER)";
         db.execSQL(CREATE_SHIPMENTS_TABLE);
 
         // Insertar usuario administrador
@@ -99,6 +100,13 @@ public class DBHelper extends SQLiteOpenHelper {
 
         if (oldVersion < 14) {
             createNotificationsTable(db);
+        }
+
+        if (oldVersion < 15) {
+            try {
+                db.execSQL("ALTER TABLE shipments ADD COLUMN remoteId INTEGER");
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -212,6 +220,12 @@ public class DBHelper extends SQLiteOpenHelper {
     // Nueva firma que guarda latitude y longitude
     public boolean insertShipment(String userEmail, String address, String date, String time,
                                   String type, String status, double latitude, double longitude) {
+        return insertShipmentReturningId(userEmail, address, date, time, type, status, latitude, longitude) != -1;
+    }
+
+    // Variante que retorna el ID insertado para poder sincronizar con el backend
+    public long insertShipmentReturningId(String userEmail, String address, String date, String time,
+                                  String type, String status, double latitude, double longitude) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("userEmail", userEmail);
@@ -222,8 +236,7 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put("status", status);
         values.put("latitude", latitude);
         values.put("longitude", longitude);
-        long result = db.insert("shipments", null, values);
-        return result != -1;
+        return db.insert("shipments", null, values);
     }
 
     // Consultas de envíos
@@ -242,6 +255,30 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM shipments WHERE id = ?",
                 new String[]{String.valueOf(id)});
+    }
+
+    public Long getShipmentRemoteId(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT remoteId FROM shipments WHERE id = ?",
+                new String[]{String.valueOf(id)});
+        try {
+            if (cursor.moveToFirst()) {
+                if (!cursor.isNull(0)) {
+                    return cursor.getLong(0);
+                }
+            }
+            return null;
+        } finally {
+            cursor.close();
+        }
+    }
+
+    public boolean setShipmentRemoteId(int id, long remoteId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("remoteId", remoteId);
+        int rows = db.update("shipments", values, "id = ?", new String[]{String.valueOf(id)});
+        return rows > 0;
     }
 
     public String getUserEmailForShipment(int shipmentId) {

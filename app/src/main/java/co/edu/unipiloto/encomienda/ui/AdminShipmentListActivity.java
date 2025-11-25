@@ -15,6 +15,7 @@ import java.util.List;
 import co.edu.unipiloto.encomienda.R;
 import co.edu.unipiloto.encomienda.db.DBHelper;
 import co.edu.unipiloto.encomienda.model.Shipment;
+import co.edu.unipiloto.encomienda.sync.BackendSync;
 
 public class AdminShipmentListActivity extends AppCompatActivity {
     
@@ -90,6 +91,8 @@ public class AdminShipmentListActivity extends AppCompatActivity {
         if (dbHelper.assignShipmentToCourier(shipmentId, courierEmail)) {
             Toast.makeText(this, "Envío asignado correctamente", 
                 Toast.LENGTH_SHORT).show();
+            // Best-effort: crear en backend y enlazar remoteId
+            BackendSync.pushShipmentCreateAndBind(this, dbHelper, shipmentId);
             loadAllShipments(); // Recargar la lista
         } else {
             Toast.makeText(this, "Error al asignar el envío", 

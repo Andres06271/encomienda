@@ -1,0 +1,36 @@
+{
+  "info": {
+    "name": "Encomienda Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "List Shipments",
+      "request": {"method": "GET", "url": {"raw": "http://localhost:8080/api/shipments", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","shipments"]}}
+    },
+    {
+      "name": "Create Shipment",
+      "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"address\": \"Calle 123\",\n  \"status\": \"PENDING\",\n  \"type\": \"BOX\",\n  \"latitude\": 4.65,\n  \"longitude\": -74.05,\n  \"userEmail\": \"user@mail.com\",\n  \"courierEmail\": \"courier@mail.com\"\n}"}, "url": {"raw": "http://localhost:8080/api/shipments", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","shipments"]}}
+    },
+    {
+      "name": "Update Shipment Status",
+      "request": {"method": "PATCH", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"status\": \"DELIVERED\"\n}"}, "url": {"raw": "http://localhost:8080/api/shipments/1/status", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","shipments","1","status"]}}
+    },
+    {
+      "name": "List Notifications",
+      "request": {"method": "GET", "url": {"raw": "http://localhost:8080/api/notifications", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","notifications"]}}
+    },
+    {
+      "name": "Create Notification",
+      "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"userEmail\": \"user@mail.com\",\n  \"title\": \"Envio entregado\",\n  \"body\": \"Tu envío #1 fue entregado\"\n}"}, "url": {"raw": "http://localhost:8080/api/notifications", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","notifications"]}}
+    },
+    {
+      "name": "Unread Notification Count",
+      "request": {"method": "GET", "url": {"raw": "http://localhost:8080/api/notifications/unread-count?userEmail=user@mail.com", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","notifications","unread-count"], "query": [{"key": "userEmail", "value": "user@mail.com"}]}}
+    },
+    {
+      "name": "Mark Notification Read",
+      "request": {"method": "PATCH", "url": {"raw": "http://localhost:8080/api/notifications/1/read", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","notifications","1","read"]}}
+    }
+  ]
+}

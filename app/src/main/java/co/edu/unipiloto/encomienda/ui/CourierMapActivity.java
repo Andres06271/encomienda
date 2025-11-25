@@ -28,6 +28,7 @@ import java.util.Locale;
 
 import co.edu.unipiloto.encomienda.R;
 import co.edu.unipiloto.encomienda.db.DBHelper;
+import co.edu.unipiloto.encomienda.sync.BackendSync;
 
 public class CourierMapActivity extends AppCompatActivity {
 
@@ -208,6 +209,11 @@ public class CourierMapActivity extends AppCompatActivity {
                 getString(R.string.notification_body_route_started, referenceAddress),
                 now
             );
+            BackendSync.pushNotification(
+                userEmail,
+                getString(R.string.notification_title_route_started),
+                getString(R.string.notification_body_route_started, referenceAddress)
+            );
         }
     }
 
@@ -292,6 +298,8 @@ public class CourierMapActivity extends AppCompatActivity {
         try {
             if (dbHelper.updateShipment(shipmentId, address, "", "", type, newStatus)) {
                 Toast.makeText(this, "Estado actualizado a: " + newStatus, Toast.LENGTH_SHORT).show();
+                // Sincronizar estado al backend si existe remoteId
+                BackendSync.pushShipmentStatus(dbHelper, shipmentId, newStatus);
                 notifyStatusChange(shipmentId, address, newStatus);
                 loadShipmentsOnMap();
             } else {
@@ -325,6 +333,9 @@ public class CourierMapActivity extends AppCompatActivity {
                 getString(R.string.notification_body_delivered, address),
                 now
             );
+            BackendSync.pushNotification(userEmail,
+                getString(R.string.notification_title_delivered),
+                getString(R.string.notification_body_delivered, address));
         } else if ("En camino".equalsIgnoreCase(status)) {
             dbHelper.insertNotification(
                 userEmail,
@@ -332,6 +343,9 @@ public class CourierMapActivity extends AppCompatActivity {
                 getString(R.string.notification_body_route_started, address),
                 now
             );
+            BackendSync.pushNotification(userEmail,
+                getString(R.string.notification_title_route_started),
+                getString(R.string.notification_body_route_started, address));
         }
     }
 

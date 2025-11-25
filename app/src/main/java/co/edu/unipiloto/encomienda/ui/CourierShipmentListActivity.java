@@ -1,7 +1,8 @@
 package co.edu.unipiloto.encomienda.ui;
 
-import android.database.Cursor;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -9,15 +10,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 import co.edu.unipiloto.encomienda.R;
+import co.edu.unipiloto.encomienda.api.dto.RemoteShipment;
 import co.edu.unipiloto.encomienda.model.Shipment;
-import co.edu.unipiloto.encomienda.db.DBHelper;
+import co.edu.unipiloto.encomienda.repository.ShipmentRepository;
 
 public class CourierShipmentListActivity extends AppCompatActivity {
     
     private RecyclerView recyclerView;
     private ShipmentAdapter adapter;
     private List<Shipment> shipmentList;
-    private DBHelper dbHelper;
+    private ShipmentRepository shipmentRepository;
+    private ProgressBar progressBar;
     private String courierEmail;
 
     @Override
@@ -35,7 +38,7 @@ public class CourierShipmentListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerShipments);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        dbHelper = new DBHelper(this);
+        shipmentRepository = new ShipmentRepository();
         shipmentList = new ArrayList<>();
         
         loadAssignedShipments();
@@ -43,28 +46,43 @@ public class CourierShipmentListActivity extends AppCompatActivity {
 
     private void loadAssignedShipments() {
         shipmentList.clear();
+        progressBar.setVisibility(View.VISIBLE);
         
-        try (Cursor cursor = dbHelper.getShipmentsAssignedToCourier(courierEmail)) {
-            if (cursor.moveToFirst()) {
-                do {
-                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
-                    String address = cursor.getString(cursor.getColumnIndexOrThrow("address"));
-                    String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
-                    String time = cursor.getString(cursor.getColumnIndexOrThrow("time"));
-                    String type = cursor.getString(cursor.getColumnIndexOrThrow("type"));
-                    String status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
+        // Consumir API del backend para obtener shipments del courier
+        shipmentRepository.getShipmentsByCourier(courierEmail, new ShipmentRepository.ShipmentListCallback() {
+            @Override
+            public void onSuccess(List<RemoteShipment> remoteShipments) {
+                progressBar.setVisibility(View.GONE);
+                shipmentList.clear();
+                
+                for (RemoteShipment remote : remoteShipments) {
+                    Shipment local = new Shipment(
+                            remote.getId().intValue(),
+                            remote.getAddress(),
+                            remote.getCreatedAt() != null ? remote.getCreatedAt().toString() : "",
+                            "",
+                            remote.getType(),
+                            remote.getStatus()
+                    );
+                    shipmentList.add(local);
+                }
 
-                    shipmentList.add(new Shipment(id, address, date, time, type, status));
-                } while (cursor.moveToNext());
+                if (adapter == null) {
+                    adapter = new ShipmentAdapter(shipmentList);
+                    adapter.setOnItemClickListener(shipment -> showChangeStatusDialog(shipment));
+                    recyclerView.setAdapter(adapter);
+                } else {
+                    adapter.notifyDataSetChanged();
+                }
             }
-        } catch (Exception e) {
-            Toast.makeText(this, "Error al cargar envíos: " + e.getMessage(), 
-                Toast.LENGTH_LONG).show();
-        }
 
-        adapter = new ShipmentAdapter(shipmentList);
-        adapter.setOnItemClickListener(shipment -> showChangeStatusDialog(shipment));
-        recyclerView.setAdapter(adapter);
+            @Override
+            public void onError(String message) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(CourierShipmentListActivity.this, 
+                        "Error al cargar envíos: " + message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void showChangeStatusDialog(Shipment shipment) {
@@ -77,22 +95,26 @@ public class CourierShipmentListActivity extends AppCompatActivity {
                 androidx.appcompat.app.AlertDialog alert = (androidx.appcompat.app.AlertDialog) dialog;
                 int selectedPosition = alert.getListView().getCheckedItemPosition();
                 String nuevoEstado = estados[selectedPosition];
-                // Actualiza el estado usando los datos actuales del envío
-                DBHelper dbHelper = new DBHelper(this);
-                boolean ok = dbHelper.updateShipment(
-                    shipment.getId(),
-                    shipment.getDireccion(),
-                    shipment.getFecha(),
-                    shipment.getHora(),
-                    shipment.getTipo(),
-                    nuevoEstado
-                );
-                if (ok) {
-                    Toast.makeText(this, "Estado actualizado", Toast.LENGTH_SHORT).show();
-                    loadAssignedShipments();
-                } else {
-                    Toast.makeText(this, "Error al actualizar estado", Toast.LENGTH_SHORT).show();
-                }
+                
+                // Actualizar estado en el backend
+                progressBar.setVisibility(View.VISIBLE);
+                shipmentRepository.updateShipmentStatus(shipment.getId(), nuevoEstado, 
+                    new ShipmentRepository.ShipmentCallback() {
+                        @Override
+                        public void onSuccess(RemoteShipment updatedShipment) {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(CourierShipmentListActivity.this, 
+                                    "Estado actualizado", Toast.LENGTH_SHORT).show();
+                            loadAssignedShipments();
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(CourierShipmentListActivity.this, 
+                                    "Error al actualizar estado: " + message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
             })
             .setNegativeButton("Cancelar", null)
             .show();

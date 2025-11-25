@@ -39,6 +39,7 @@ import java.util.concurrent.Executors;
 
 import co.edu.unipiloto.encomienda.R;
 import co.edu.unipiloto.encomienda.db.DBHelper;
+import co.edu.unipiloto.encomienda.sync.BackendSync;
 
 public class ShipmentActivity extends AppCompatActivity {
 
@@ -138,10 +139,10 @@ public class ShipmentActivity extends AppCompatActivity {
             return;
         }
 
-        boolean inserted = dbHelper.insertShipment(userEmail, address, date, time, type,
+        long newId = dbHelper.insertShipmentReturningId(userEmail, address, date, time, type,
             "Pendiente", selectedLat, selectedLon);
 
-        if (inserted) {
+        if (newId != -1) {
             Toast.makeText(this, "Envío guardado correctamente", Toast.LENGTH_LONG).show();
             etAddress.setText("");
             etDate.setText("");
@@ -152,6 +153,8 @@ public class ShipmentActivity extends AppCompatActivity {
             selectedLon = 0.0;
             selectedLocation = null;
             mapPreviewCard.setVisibility(View.GONE);
+            // Enviar al backend y asociar remoteId (si el backend está disponible)
+            BackendSync.pushShipmentCreateAndBind(this, dbHelper, (int)newId);
             insertNotificationForUser(address);
         } else {
             Toast.makeText(this, "Error al guardar el envío", Toast.LENGTH_LONG).show();
@@ -165,6 +168,11 @@ public class ShipmentActivity extends AppCompatActivity {
             getString(R.string.notification_title_new_shipment),
             getString(R.string.notification_body_new_shipment, address),
             now
+        );
+        BackendSync.pushNotification(
+            userEmail,
+            getString(R.string.notification_title_new_shipment),
+            getString(R.string.notification_body_new_shipment, address)
         );
     }
 

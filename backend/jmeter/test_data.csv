@@ -1,0 +1,11 @@
+userEmail,courierEmail,address,type,status,latitude,longitude
+user1@mail.com,courier1@mail.com,Calle 123 #45-67,BOX,PENDING,4.6097100,-74.0817500
+user2@mail.com,courier2@mail.com,Carrera 7 #32-16,ENVELOPE,IN_TRANSIT,4.6533300,-74.0836100
+user3@mail.com,courier3@mail.com,Avenida Jimenez #5-43,BOX,DELIVERED,4.5980600,-74.0760900
+user4@mail.com,courier1@mail.com,Calle 26 #69-76,PACKAGE,PENDING,4.6378900,-74.1155600
+user5@mail.com,courier2@mail.com,Carrera 15 #93-42,BOX,IN_TRANSIT,4.6766700,-74.0558900
+user6@mail.com,courier3@mail.com,Calle 100 #18-30,ENVELOPE,DELIVERED,4.6920600,-74.0386400
+user7@mail.com,courier1@mail.com,Carrera 30 #45-03,BOX,PENDING,4.6389100,-74.0793900
+user8@mail.com,courier2@mail.com,Calle 72 #10-34,PACKAGE,IN_TRANSIT,4.6572500,-74.0608900
+user9@mail.com,courier3@mail.com,Avenida Caracas #50-00,BOX,DELIVERED,4.6280600,-74.0670300
+user10@mail.com,courier1@mail.com,Calle 19 #5-14,ENVELOPE,PENDING,4.6008900,-74.0693900

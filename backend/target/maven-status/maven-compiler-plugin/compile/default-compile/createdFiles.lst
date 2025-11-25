@@ -1,0 +1,10 @@
+com\encomienda\api\entity\Shipment.class
+com\encomienda\api\config\CorsConfig.class
+com\encomienda\api\EncomiendaApplication.class
+com\encomienda\api\controller\HelloController.class
+com\encomienda\api\entity\Notification.class
+com\encomienda\api\controller\NotificationController.class
+com\encomienda\api\controller\ShipmentController.class
+com\encomienda\api\repository\NotificationRepository.class
+com\encomienda\api\config\CorsConfig$1.class
+com\encomienda\api\repository\ShipmentRepository.class
